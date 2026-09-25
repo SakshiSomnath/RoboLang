@@ -1,0 +1,6 @@
+START
+
+x = 5
+MOVE x;
+
+END
