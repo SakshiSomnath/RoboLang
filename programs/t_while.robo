@@ -1,0 +1,9 @@
+START
+n = 3;
+WHILE n > 0 DO {
+    MOVE 1;
+    TURN RIGHT;
+    n = n - 1;
+}
+END
+END

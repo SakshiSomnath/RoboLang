@@ -1,0 +1,4 @@
+START
+x = 0;
+MOVE 6 / x;
+END

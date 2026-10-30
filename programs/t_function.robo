@@ -1,0 +1,12 @@
+START
+DEFINE sq(n) {
+    REPEAT 4 TIMES {
+        MOVE n;
+        TURN RIGHT;
+    }
+}
+END
+sq(2);
+TURN LEFT;
+sq(1);
+END

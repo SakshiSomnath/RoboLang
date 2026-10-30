@@ -1,0 +1,922 @@
+##### T1 programs/phase2_safe.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+
+x = 2 + 1;
+steps = x;
+
+REPEAT 2 TIMES {
+    MOVE steps;
+    TURN RIGHT;
+}
+
+IF x > 2 THEN {
+    MOVE 1;
+} ELSE {
+    MOVE 0;
+}
+END
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      x
+ASSIGN          =
+NUMBER          2
+PLUS            +
+NUMBER          1
+SEMICOLON       ;
+IDENTIFIER      steps
+ASSIGN          =
+IDENTIFIER      x
+SEMICOLON       ;
+REPEAT          REPEAT
+NUMBER          2
+TIMES           TIMES
+LBRACE          {
+MOVE            MOVE
+IDENTIFIER      steps
+SEMICOLON       ;
+TURN            TURN
+RIGHT           RIGHT
+SEMICOLON       ;
+RBRACE          }
+IF              IF
+IDENTIFIER      x
+GREATER         >
+NUMBER          2
+THEN            THEN
+LBRACE          {
+MOVE            MOVE
+NUMBER          1
+SEMICOLON       ;
+RBRACE          }
+ELSE            ELSE
+LBRACE          {
+MOVE            MOVE
+NUMBER          0
+SEMICOLON       ;
+RBRACE          }
+END             END
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  ASSIGNMENT: x
+    OPERATOR: +
+      NUMBER: 2
+      NUMBER: 1
+  ASSIGNMENT: steps
+    IDENTIFIER: x
+  REPEAT
+    NUMBER: 2
+    MOVE
+      IDENTIFIER: steps
+    TURN: RIGHT
+  IF
+    CONDITION
+      OPERATOR: >
+        IDENTIFIER: x
+        NUMBER: 2
+    THEN
+      MOVE
+        NUMBER: 1
+    ELSE
+      MOVE
+        NUMBER: 0
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+No statically detectable robot-state safety issues.
+Predicted robot state: position (8, 3), direction SOUTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: t1 = 2 + 1
+02: x = t1
+03: steps = x
+04: t2 = 2
+05: LABEL L1
+06: IF t2 <= 0 GOTO L2
+07: MOVE steps
+08: TURN RIGHT
+09: t2 = t2 - 1
+10: GOTO L1
+11: LABEL L2
+12: t3 = x > 2
+13: IF_FALSE t3 GOTO L3
+14: MOVE 1
+15: GOTO L4
+16: LABEL L3
+17: MOVE 0
+18: LABEL L4
+
+===== OPTIMIZED IR =====
+01: t1 = 3
+02: x = t1
+03: steps = x
+04: t2 = 2
+05: LABEL L1
+06: IF t2 <= 0 GOTO L2
+07: MOVE steps
+08: TURN RIGHT
+09: t2 = t2 - 1
+10: GOTO L1
+11: LABEL L2
+12: t3 = x > 2
+13: IF_FALSE t3 GOTO L3
+14: MOVE 1
+15: GOTO L4
+16: LABEL L3
+17: MOVE 0
+18: LABEL L4
+
+Optimization: 18 instructions -> 18 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {'x': 3, 'steps': 3}
+
+===== ROBOT GRID =====
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - . . . . - - 
+- - - - - . - - R - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (8, 3)
+Direction: SOUTH
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T2 programs/phase2_safety_boundary.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+
+MOVE 20;
+
+END
+
+===== TOKENS =====
+START           START
+MOVE            MOVE
+NUMBER          20
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  MOVE
+    NUMBER: 20
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+Robot Analysis Warning: MOVE 20 from (5, 5) facing NORTH may cross the 11x11 grid boundary.
+Static analysis completed with 1 warning(s).
+Predicted robot state: position (5, 0), direction NORTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: MOVE 20
+
+===== OPTIMIZED IR =====
+01: MOVE 20
+
+Optimization: 1 instructions -> 1 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {}
+
+===== ROBOT GRID =====
+- - - - - R - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (5, 0)
+Direction: NORTH
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T3 programs/phase2_semantic_error.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+
+x = 5;
+MOVE y;
+
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      x
+ASSIGN          =
+NUMBER          5
+SEMICOLON       ;
+MOVE            MOVE
+IDENTIFIER      y
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  ASSIGNMENT: x
+    NUMBER: 5
+  MOVE
+    IDENTIFIER: y
+
+===== SEMANTIC ANALYSIS =====
+Semantic Error: Variable 'y' is not declared.
+
+Compilation stopped because of semantic errors.
+
+
+##### T4 programs/phase2_syntax_error.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+
+x = 5
+MOVE x;
+
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      x
+ASSIGN          =
+NUMBER          5
+MOVE            MOVE
+IDENTIFIER      x
+SEMICOLON       ;
+END             END
+
+Syntax Error at line 4: Expected ';' after assignment. (found 'MOVE')
+
+
+##### T5 programs/t_lexical.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+MOVE 3 @ 2;
+END
+
+Lexical Error at line 2: Unknown character '@'
+
+
+##### T6 programs/t_scope_repeat.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+REPEAT 1 TIMES {
+    y = 4;
+}
+MOVE y;
+END
+
+===== TOKENS =====
+START           START
+REPEAT          REPEAT
+NUMBER          1
+TIMES           TIMES
+LBRACE          {
+IDENTIFIER      y
+ASSIGN          =
+NUMBER          4
+SEMICOLON       ;
+RBRACE          }
+MOVE            MOVE
+IDENTIFIER      y
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  REPEAT
+    NUMBER: 1
+    ASSIGNMENT: y
+      NUMBER: 4
+  MOVE
+    IDENTIFIER: y
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+No statically detectable robot-state safety issues.
+Predicted robot state: position (5, 1), direction NORTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: t1 = 1
+02: LABEL L1
+03: IF t1 <= 0 GOTO L2
+04: y = 4
+05: t1 = t1 - 1
+06: GOTO L1
+07: LABEL L2
+08: MOVE y
+
+===== OPTIMIZED IR =====
+01: t1 = 1
+02: LABEL L1
+03: IF t1 <= 0 GOTO L2
+04: y = 4
+05: t1 = t1 - 1
+06: GOTO L1
+07: LABEL L2
+08: MOVE y
+
+Optimization: 8 instructions -> 8 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {'y': 4}
+
+===== ROBOT GRID =====
+- - - - - - - - - - - 
+- - - - - R - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (5, 1)
+Direction: NORTH
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T7 programs/t_scope_if.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+x = 1;
+IF x > 0 THEN {
+    z = 3;
+}
+END
+MOVE z;
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      x
+ASSIGN          =
+NUMBER          1
+SEMICOLON       ;
+IF              IF
+IDENTIFIER      x
+GREATER         >
+NUMBER          0
+THEN            THEN
+LBRACE          {
+IDENTIFIER      z
+ASSIGN          =
+NUMBER          3
+SEMICOLON       ;
+RBRACE          }
+END             END
+MOVE            MOVE
+IDENTIFIER      z
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  ASSIGNMENT: x
+    NUMBER: 1
+  IF
+    CONDITION
+      OPERATOR: >
+        IDENTIFIER: x
+        NUMBER: 0
+    THEN
+      ASSIGNMENT: z
+        NUMBER: 3
+  MOVE
+    IDENTIFIER: z
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+No statically detectable robot-state safety issues.
+Predicted robot state: position (5, 2), direction NORTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: x = 1
+02: t1 = x > 0
+03: IF_FALSE t1 GOTO L1
+04: z = 3
+05: GOTO L2
+06: LABEL L1
+07: LABEL L2
+08: MOVE z
+
+===== OPTIMIZED IR =====
+01: x = 1
+02: t1 = x > 0
+03: IF_FALSE t1 GOTO L1
+04: z = 3
+05: GOTO L2
+06: LABEL L1
+07: LABEL L2
+08: MOVE z
+
+Optimization: 8 instructions -> 8 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {'x': 1, 'z': 3}
+
+===== ROBOT GRID =====
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - R - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - . - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (5, 2)
+Direction: NORTH
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T8 programs/t_func_leak.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+DEFINE f() {
+    loc = 9;
+}
+END
+f();
+MOVE loc;
+END
+
+===== TOKENS =====
+START           START
+DEFINE          DEFINE
+IDENTIFIER      f
+LPAREN          (
+RPAREN          )
+LBRACE          {
+IDENTIFIER      loc
+ASSIGN          =
+NUMBER          9
+SEMICOLON       ;
+RBRACE          }
+END             END
+IDENTIFIER      f
+LPAREN          (
+RPAREN          )
+SEMICOLON       ;
+MOVE            MOVE
+IDENTIFIER      loc
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  FUNCTION: f()
+    ASSIGNMENT: loc
+      NUMBER: 9
+  CALL: f
+  MOVE
+    IDENTIFIER: loc
+
+===== SEMANTIC ANALYSIS =====
+Semantic Error: Variable 'loc' is not declared.
+
+Compilation stopped because of semantic errors.
+
+
+##### T9 programs/t_function.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+DEFINE sq(n) {
+    REPEAT 4 TIMES {
+        MOVE n;
+        TURN RIGHT;
+    }
+}
+END
+sq(2);
+TURN LEFT;
+sq(1);
+END
+
+===== TOKENS =====
+START           START
+DEFINE          DEFINE
+IDENTIFIER      sq
+LPAREN          (
+IDENTIFIER      n
+RPAREN          )
+LBRACE          {
+REPEAT          REPEAT
+NUMBER          4
+TIMES           TIMES
+LBRACE          {
+MOVE            MOVE
+IDENTIFIER      n
+SEMICOLON       ;
+TURN            TURN
+RIGHT           RIGHT
+SEMICOLON       ;
+RBRACE          }
+RBRACE          }
+END             END
+IDENTIFIER      sq
+LPAREN          (
+NUMBER          2
+RPAREN          )
+SEMICOLON       ;
+TURN            TURN
+LEFT            LEFT
+SEMICOLON       ;
+IDENTIFIER      sq
+LPAREN          (
+NUMBER          1
+RPAREN          )
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  FUNCTION: sq(n)
+    REPEAT
+      NUMBER: 4
+      MOVE
+        IDENTIFIER: n
+      TURN: RIGHT
+  CALL: sq
+    NUMBER: 2
+  TURN: LEFT
+  CALL: sq
+    NUMBER: 1
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+Robot Analysis Warning: Function call 'sq' is not expanded during static robot-state analysis.
+Static analysis completed with 1 warning(s).
+Predicted robot state: position (5, 5), direction WEST
+
+===== THREE ADDRESS CODE (IR) =====
+01: FUNCTION sq
+02: t1 = 4
+03: LABEL L1
+04: IF t1 <= 0 GOTO L2
+05: MOVE n
+06: TURN RIGHT
+07: t1 = t1 - 1
+08: GOTO L1
+09: LABEL L2
+10: END_FUNCTION
+11: CALL sq(2)
+12: TURN LEFT
+13: CALL sq(1)
+
+===== OPTIMIZED IR =====
+01: FUNCTION sq
+02: t1 = 4
+03: LABEL L1
+04: IF t1 <= 0 GOTO L2
+05: MOVE n
+06: TURN RIGHT
+07: t1 = t1 - 1
+08: GOTO L1
+09: LABEL L2
+10: END_FUNCTION
+11: CALL sq(2)
+12: TURN LEFT
+13: CALL sq(1)
+
+Optimization: 13 instructions -> 13 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {}
+
+===== ROBOT GRID =====
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - . . . - - - 
+- - - - . . - . - - - 
+- - - - . R . . - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (5, 5)
+Direction: WEST
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T10 programs/t_while.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+n = 3;
+WHILE n > 0 DO {
+    MOVE 1;
+    TURN RIGHT;
+    n = n - 1;
+}
+END
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      n
+ASSIGN          =
+NUMBER          3
+SEMICOLON       ;
+WHILE           WHILE
+IDENTIFIER      n
+GREATER         >
+NUMBER          0
+DO              DO
+LBRACE          {
+MOVE            MOVE
+NUMBER          1
+SEMICOLON       ;
+TURN            TURN
+RIGHT           RIGHT
+SEMICOLON       ;
+IDENTIFIER      n
+ASSIGN          =
+IDENTIFIER      n
+MINUS           -
+NUMBER          1
+SEMICOLON       ;
+RBRACE          }
+END             END
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  ASSIGNMENT: n
+    NUMBER: 3
+  WHILE
+    OPERATOR: >
+      IDENTIFIER: n
+      NUMBER: 0
+    MOVE
+      NUMBER: 1
+    TURN: RIGHT
+    ASSIGNMENT: n
+      OPERATOR: -
+        IDENTIFIER: n
+        NUMBER: 1
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+Robot Analysis Warning: WHILE condition is statically true; exact iteration count cannot be proven safe.
+Static analysis completed with 1 warning(s).
+Predicted robot state: position (5, 5), direction NORTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: n = 3
+02: LABEL L1
+03: t1 = n > 0
+04: IF_FALSE t1 GOTO L2
+05: MOVE 1
+06: TURN RIGHT
+07: t2 = n - 1
+08: n = t2
+09: GOTO L1
+10: LABEL L2
+
+===== OPTIMIZED IR =====
+01: n = 3
+02: LABEL L1
+03: t1 = n > 0
+04: IF_FALSE t1 GOTO L2
+05: MOVE 1
+06: TURN RIGHT
+07: t2 = n - 1
+08: n = t2
+09: GOTO L1
+10: LABEL L2
+
+Optimization: 10 instructions -> 10 instructions
+
+===== EXECUTION =====
+Program executed successfully.
+Variables: {'n': 0}
+
+===== ROBOT GRID =====
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - . . - - - - 
+- - - - - . R - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+- - - - - - - - - - - 
+
+Robot position: (6, 5)
+Direction: WEST
+R = Robot, . = Visited path
+
+========================================
+       ROBOLANG EXECUTION COMPLETE
+========================================
+
+
+##### T11 programs/t_divzero.robo  ->  PASS
+========================================
+          ROBOLANG COMPILER
+========================================
+Lexer -> Parser -> AST -> Semantic Analysis
+      -> Robot Program Analysis -> IR
+      -> Optimization -> Interpreter
+========================================
+
+===== SOURCE PROGRAM =====
+START
+x = 0;
+MOVE 6 / x;
+END
+
+===== TOKENS =====
+START           START
+IDENTIFIER      x
+ASSIGN          =
+NUMBER          0
+SEMICOLON       ;
+MOVE            MOVE
+NUMBER          6
+DIVIDE          /
+IDENTIFIER      x
+SEMICOLON       ;
+END             END
+
+===== ABSTRACT SYNTAX TREE =====
+PROGRAM
+  ASSIGNMENT: x
+    NUMBER: 0
+  MOVE
+    OPERATOR: /
+      NUMBER: 6
+      IDENTIFIER: x
+
+===== SEMANTIC ANALYSIS =====
+No semantic errors.
+Symbol table check: PASSED
+
+===== ROBOT PROGRAM ANALYSIS =====
+Robot Analysis Warning: Could not statically determine a MOVE distance; boundary safety cannot be guaranteed for this instruction.
+Static analysis completed with 1 warning(s).
+Predicted robot state: position (5, 5), direction NORTH
+
+===== THREE ADDRESS CODE (IR) =====
+01: x = 0
+02: t1 = 6 / x
+03: MOVE t1
+
+===== OPTIMIZED IR =====
+01: x = 0
+02: t1 = 6 / x
+03: MOVE t1
+
+Optimization: 3 instructions -> 3 instructions
+
+Runtime Error: Division by zero.
+

@@ -1,0 +1,8 @@
+START
+x = 1;
+IF x > 0 THEN {
+    z = 3;
+}
+END
+MOVE z;
+END

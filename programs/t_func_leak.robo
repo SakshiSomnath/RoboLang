@@ -1,0 +1,8 @@
+START
+DEFINE f() {
+    loc = 9;
+}
+END
+f();
+MOVE loc;
+END

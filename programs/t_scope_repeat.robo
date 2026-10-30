@@ -1,0 +1,6 @@
+START
+REPEAT 1 TIMES {
+    y = 4;
+}
+MOVE y;
+END
